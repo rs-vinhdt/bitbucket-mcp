@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:dev.to)",
+      "WebFetch(domain:hackteam.io)",
+      "WebFetch(domain:ts.sdk.modelcontextprotocol.io)",
+      "WebFetch(domain:www.npmjs.com)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(node dist/index.js)",
+      "Bash(echo \"Exit code: $?\")",
+      "Bash(BITBUCKET_URL=https://test.example.com node dist/index.js)",
+      "Bash(echo \"Exit: $?\")",
+      "Bash(chmod +x /home/vinhdt/Projects/bitbucket-mcp/test.sh)",
+      "Bash(bash /home/vinhdt/Projects/bitbucket-mcp/test.sh)",
+      "Read(//home/vinhdt/.claude/**)"
+    ]
+  }
+}
