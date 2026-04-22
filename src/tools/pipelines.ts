@@ -38,15 +38,25 @@ export function registerPipelineTools(server: McpServer, client: BitbucketClient
 
   server.tool(
     "trigger_pipeline",
-    "Trigger a new pipeline run on a branch or tag",
+    "Trigger a new pipeline run on a branch or tag, optionally with custom pipeline pattern and variables",
     {
       workspace: z.string().describe("Workspace slug"),
       repoSlug: z.string().describe("Repository slug"),
       refName: z.string().describe("Branch or tag name to run the pipeline on"),
       refType: z.enum(["branch", "tag"]).default("branch").describe("Reference type"),
       pattern: z.string().optional().describe("Custom pipeline pattern name (from bitbucket-pipelines.yml)"),
+      variables: z
+        .array(
+          z.object({
+            key: z.string().describe("Variable name"),
+            value: z.string().describe("Variable value"),
+            secured: z.boolean().optional().describe("Mark value as secured (masked in logs)"),
+          })
+        )
+        .optional()
+        .describe("Pipeline variables (e.g. [{key: 'CLUSTER_NAME', value: 'provrel2'}])"),
     },
-    async ({ workspace, repoSlug, refName, refType, pattern }) => {
+    async ({ workspace, repoSlug, refName, refType, pattern, variables }) => {
       const target: {
         type: "pipeline_ref_target";
         ref_type: "branch" | "tag";
@@ -60,7 +70,7 @@ export function registerPipelineTools(server: McpServer, client: BitbucketClient
       if (pattern) {
         target.selector = { type: "custom", pattern };
       }
-      const result = await client.triggerPipeline(workspace, repoSlug, target);
+      const result = await client.triggerPipeline(workspace, repoSlug, target, variables);
       return {
         content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
       };

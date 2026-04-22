@@ -372,11 +372,14 @@ export class BitbucketClient {
       ref_type: "branch" | "tag";
       ref_name: string;
       selector?: { type: "custom"; pattern: string };
-    }
+    },
+    variables?: PipelineVariable[]
   ): Promise<Pipeline> {
+    const body: { target: typeof target; variables?: PipelineVariable[] } = { target };
+    if (variables && variables.length > 0) body.variables = variables;
     return this.post(
       `/repositories/${encodeURIComponent(workspace)}/${encodeURIComponent(repoSlug)}/pipelines`,
-      { target }
+      body
     );
   }
 
@@ -425,6 +428,12 @@ export class BitbucketClient {
 }
 
 // --- Pipeline types (Cloud-specific) ---
+
+export interface PipelineVariable {
+  key: string;
+  value: string;
+  secured?: boolean;
+}
 
 export interface Pipeline {
   uuid: string;
