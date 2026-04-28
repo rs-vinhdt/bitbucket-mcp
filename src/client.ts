@@ -211,6 +211,23 @@ export class BitbucketClient {
     );
   }
 
+  async updatePullRequest(
+    workspace: string,
+    repoSlug: string,
+    prId: number,
+    data: {
+      title?: string;
+      description?: string;
+      destination?: { branch: { name: string } };
+      reviewers?: { uuid: string }[];
+    }
+  ): Promise<PullRequest> {
+    return this.put(
+      `/repositories/${encodeURIComponent(workspace)}/${encodeURIComponent(repoSlug)}/pullrequests/${prId}`,
+      data
+    );
+  }
+
   async getPullRequestDiff(
     workspace: string,
     repoSlug: string,

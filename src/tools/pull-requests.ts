@@ -119,6 +119,27 @@ export function registerPullRequestTools(server: McpServer, client: BitbucketCli
   );
 
   server.tool(
+    "update_pull_request_destination",
+    "Retarget a pull request to a different destination branch",
+    {
+      workspace: z.string().describe("Workspace slug"),
+      repoSlug: z.string().describe("Repository slug"),
+      prId: z.number().int().describe("Pull request ID"),
+      destinationBranch: z.string().describe("New destination branch name"),
+    },
+    async ({ workspace, repoSlug, prId, destinationBranch }) => {
+      const current = await client.getPullRequest(workspace, repoSlug, prId);
+      const result = await client.updatePullRequest(workspace, repoSlug, prId, {
+        title: current.title,
+        destination: { branch: { name: destinationBranch } },
+      });
+      return {
+        content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+      };
+    }
+  );
+
+  server.tool(
     "add_pull_request_comment",
     "Add a comment to a pull request",
     {
