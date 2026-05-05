@@ -15,27 +15,30 @@ An MCP (Model Context Protocol) server that connects AI assistants to Bitbucket 
 
 ## Setup
 
-### 1. Create a Bitbucket App Password
+### 1. Create an Atlassian API Token
 
-1. Log in to [bitbucket.org](https://bitbucket.org)
-2. Click your avatar (bottom-left) → **Personal settings**
-3. Under **Access management**, click **App passwords**
-4. Click **Create app password**
-5. Give it a label (e.g. `claude-mcp`)
-6. Select the permissions you need:
+> **Note:** Atlassian replaced App Passwords with **API tokens with scopes**. Existing App Passwords will be disabled on **June 9, 2026** — use an API token going forward.
 
-   | Permission | Required for |
+1. Go to [id.atlassian.com/manage-profile/security/api-tokens](https://id.atlassian.com/manage-profile/security/api-tokens)
+2. Click **Create API token with scopes**
+3. Give it a label (e.g. `claude-mcp`) and select an **expiry date** (max 1 year)
+4. Select **Bitbucket** as the app
+5. (Optional) Restrict to a specific **workspace**
+6. Select the scopes you need:
+
+   | Scope | Required for |
    |---|---|
-   | **Account: Read** | `list_workspaces`, `get_workspace` |
-   | **Projects: Read** | `list_projects` |
-   | **Repositories: Read** | `list_repositories`, `get_repository`, `list_branches`, `list_commits`, `get_file_content` |
-   | **Repositories: Write** | (only if you need to create repos) |
-   | **Pull requests: Read** | `list_pull_requests`, `get_pull_request`, `get_pull_request_diff`, `get_pull_request_diffstat`, `get_pull_request_comments` |
-   | **Pull requests: Write** | `create_pull_request`, `add_pull_request_comment`, `approve_pull_request`, `merge_pull_request`, `decline_pull_request` |
-   | **Pipelines: Read** | `list_pipelines`, `get_pipeline`, `list_pipeline_steps`, `get_pipeline_step_log` |
-   | **Pipelines: Write** | `trigger_pipeline`, `stop_pipeline` |
+   | `read:account` | `list_workspaces`, `get_workspace` |
+   | `read:project:bitbucket` | `list_projects` |
+   | `read:repository:bitbucket` | `list_repositories`, `get_repository`, `list_branches`, `list_commits`, `get_file_content` |
+   | `read:pullrequest:bitbucket` | `list_pull_requests`, `get_pull_request`, `get_pull_request_diff`, `get_pull_request_diffstat`, `get_pull_request_comments` |
+   | `write:pullrequest:bitbucket` | `create_pull_request`, `update_pull_request_destination`, `add_pull_request_comment`, `approve_pull_request`, `merge_pull_request`, `decline_pull_request` |
+   | `read:pipeline:bitbucket` | `list_pipelines`, `get_pipeline`, `list_pipeline_steps`, `get_pipeline_step_log` |
+   | `write:pipeline:bitbucket` | `trigger_pipeline`, `stop_pipeline` |
 
-7. Click **Create** and **copy the generated password** — you won't see it again
+7. Click **Create** and **copy the token immediately** — it's only shown once
+
+The API token is used **exactly like an App Password**: as the `BITBUCKET_PASSWORD` value, paired with your Atlassian email as `BITBUCKET_USERNAME`. Auth is HTTP Basic (`email:api-token`).
 
 ### 2. Install & Build
 
@@ -51,7 +54,7 @@ npm run build
 ```bash
 claude mcp add bitbucket \
   -e BITBUCKET_USERNAME=you@example.com \
-  -e BITBUCKET_PASSWORD=your-app-password \
+  -e BITBUCKET_PASSWORD=your-api-token \
   -- node /path/to/bitbucket-mcp/dist/index.js
 ```
 
@@ -75,7 +78,7 @@ Add to your Claude Desktop MCP config (`~/Library/Application Support/Claude/cla
       "args": ["/absolute/path/to/bitbucket-mcp/dist/index.js"],
       "env": {
         "BITBUCKET_USERNAME": "you@example.com",
-        "BITBUCKET_PASSWORD": "your-app-password"
+        "BITBUCKET_PASSWORD": "your-api-token"
       }
     }
   }
@@ -87,7 +90,7 @@ Add to your Claude Desktop MCP config (`~/Library/Application Support/Claude/cla
 | Variable | Required | Description |
 |---|---|---|
 | `BITBUCKET_USERNAME` | Yes* | Atlassian account email |
-| `BITBUCKET_PASSWORD` | Yes* | Bitbucket App Password |
+| `BITBUCKET_PASSWORD` | Yes* | Atlassian API token (or legacy App Password) |
 | `BITBUCKET_TOKEN` | Alt* | OAuth2 access token (uses Bearer auth instead) |
 | `BITBUCKET_URL` | No | API base URL (default: `https://api.bitbucket.org/2.0`) |
 
@@ -106,7 +109,7 @@ bash test.sh         # Smoke test (no Bitbucket credentials needed)
 
 ```bash
 export BITBUCKET_USERNAME=you@example.com
-export BITBUCKET_PASSWORD=your-app-password
+export BITBUCKET_PASSWORD=your-api-token
 npx @modelcontextprotocol/inspector node dist/index.js
 ```
 

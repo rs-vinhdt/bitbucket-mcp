@@ -56,16 +56,16 @@ Each tool file exports a `register*Tools(server, client)` function that calls `s
 
 ## Environment Variables
 
-Two auth methods are supported. **App Password (Basic auth) is recommended** for Bitbucket Cloud. `BITBUCKET_URL` defaults to `https://api.bitbucket.org/2.0` if not set.
+Two auth methods are supported. **Atlassian API token (Basic auth) is recommended** for Bitbucket Cloud. `BITBUCKET_URL` defaults to `https://api.bitbucket.org/2.0` if not set.
 
 | Variable | Description |
 |---|---|
 | `BITBUCKET_URL` | Optional. API base URL (default: `https://api.bitbucket.org/2.0`) |
-| `BITBUCKET_USERNAME` | **Recommended.** Atlassian account email (for App Password / Basic auth) |
-| `BITBUCKET_PASSWORD` | **Recommended.** Bitbucket App Password (create at Bitbucket → Settings → App passwords) |
+| `BITBUCKET_USERNAME` | **Recommended.** Atlassian account email (for API token / Basic auth) |
+| `BITBUCKET_PASSWORD` | **Recommended.** Atlassian API token from id.atlassian.com/manage-profile/security/api-tokens (legacy App Passwords also accepted until 2026-06-09) |
 | `BITBUCKET_TOKEN` | Alternative: OAuth2 access token → `Authorization: Bearer <token>` |
 
-**Note:** Bitbucket Cloud App Passwords require Basic auth (`email:app-password`), NOT Bearer tokens. Only OAuth2 access tokens use Bearer.
+**Note:** Atlassian API tokens (and legacy App Passwords) require Basic auth (`email:token`), NOT Bearer tokens. Only OAuth2 access tokens use Bearer.
 
 ## MCP Client Configuration
 
@@ -74,7 +74,7 @@ To use with Claude Desktop or Claude Code CLI:
 ```bash
 claude mcp add bitbucket \
   -e BITBUCKET_USERNAME=you@example.com \
-  -e BITBUCKET_PASSWORD=your-app-password \
+  -e BITBUCKET_PASSWORD=your-api-token \
   -- node /path/to/bitbucket-mcp/dist/index.js
 ```
 
@@ -88,7 +88,7 @@ Or add to MCP config JSON:
       "args": ["/path/to/bitbucket-mcp/dist/index.js"],
       "env": {
         "BITBUCKET_USERNAME": "you@example.com",
-        "BITBUCKET_PASSWORD": "your-app-password"
+        "BITBUCKET_PASSWORD": "your-api-token"
       }
     }
   }
